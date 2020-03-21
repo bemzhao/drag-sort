@@ -21,7 +21,7 @@
         <span></span>
 			</div>
 		</div>
-		<!-- <div class="item">
+		<div class="item">
 			<div class="num">2</div>
 			<h4>选项B</h4>
 			<div class="menu">
@@ -47,7 +47,7 @@
 		        <span></span>
 		        <span></span>
 			</div>
-		</div> -->
+		</div>
 	</div>
 
 	<script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
@@ -60,58 +60,57 @@
 			var lastMoveY = null;  // 记录最后移动到的位置
 			var tempTranslateY = null  // 记录移动后的值
 
-			$(document).on("touchstart", ".item", function (e) {
+			var thisItemtop = 0;  // 当前item距离父元素顶部的高度
+
+			$(".item").on("touchstart", dragStart);
+      $(".item").on("touchmove", dragMove);
+      $(".item").on("touchend", dragEnd);
+
+			function dragStart (e) {
+				e.preventDefault();
 				isdrag = true;
 				touchY = e.originalEvent.targetTouches[0].pageY
-				// console.log(touchY)
 
 				offsetY = touchY - $(this).offset().top;
-				// console.log(offsetY)
 
 				$(this).addClass("moving").siblings().addClass("disable");
-			})
+
+				if ($(this).index() !== 0) {
+					thisItemtop = $(this).position().top;
+				}
+			}
 
 
-			$(document).on("touchmove", ".item", function (e) {
-				moveY = e.originalEvent.targetTouches[0].pageY;
+			function dragMove (e) {
+				e.preventDefault();
+				// 移动时产生的距离
+				moveY = e.originalEvent.targetTouches[0].pageY - touchY;
+				console.log(moveY)
 
-				// 用容器的大小减去移动元素的大小就是可移动范围
-				// var maxX = $(".list").innerWidth() - $(this).outerWidth();
-				// var maxY = $(".list").innerHeight() - $(this).outerHeight();
+				var maxY = $(".list").outerHeight() - $(this).innerHeight()
 
-				// moveX = Math.min(maxX, Math.max(0, moveX-touchX));
-				// moveY = Math.min(Math.max(0, moveY-touchY), );
-
-
-				// 向上移动时
-				// moveY = Math.min(moveY-touchY, $(this).position().top);
-				// console.log(moveY)
-				// 向下移动时
-				// moveY = Math.max(moveY-touchY, $(".list").innerHeight()-$(this).outerHeight()+$(this).position().top);
-
-				// moveY = Math.min($(".list").innerHeight()-$(this).outerHeight()+$(this).offset().top, Math.max(0, moveY-touchY));
-
-
-				// 限制移动范围
-				if(moveY-offsetY < $(".list").offset().top || moveY+$(this).outerHeight()-offsetY > $(".list").offset().top+$(".list").outerHeight()){
-					return;
+				if ($(this).index() === 0) {
+					// 第一个item的移动
+					moveY = Math.min(Math.max(0, moveY), maxY)
+				} else {
+					// 其他item的移动
+					moveY = Math.min(Math.max(-thisItemtop, moveY), maxY-thisItemtop)
+					console.log(moveY)
 				}
 
 				if (isdrag === true) {
-					// 获取滑动方向
-					moveY = moveY - touchY;
-
 					$(this).css({"transform": `translateY(${lastMoveY+moveY}px)`})
 				}
 				tempTranslateY = lastMoveY+moveY
-			})
+			}
 
 
-			$(document).on("touchend", ".item", function (e) {
+			function dragEnd (e) {
+				e.preventDefault();
 				isdrag = false;
 				lastMoveY = tempTranslateY
 				$(this).removeClass("moving").siblings().removeClass("disable");
-			})
+			}
 		})
 	</script>
 </body>
