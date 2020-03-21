@@ -11,23 +11,23 @@
 	<!-- <script>less.watch();</script> -->
 </head>
 <body>
-	<div class="list">
+	<div class="list" style="height: 209px; border-bottom: 1px solid #ddd">
 		<div class="item">
 			<div class="num">1</div>
 			<h4>选项A</h4>
-			<div class="menu">
+			<div class="menu" style="">
 				<span></span>
         <span></span>
         <span></span>
 			</div>
 		</div>
-		<div class="item">
+		<!-- <div class="item">
 			<div class="num">2</div>
 			<h4>选项B</h4>
 			<div class="menu">
 				<span></span>
-        <span></span>
-        <span></span>
+		        <span></span>
+		        <span></span>
 			</div>
 		</div>
 		<div class="item">
@@ -35,8 +35,8 @@
 			<h4>选项C</h4>
 			<div class="menu">
 				<span></span>
-        <span></span>
-        <span></span>
+		        <span></span>
+		        <span></span>
 			</div>
 		</div>
 		<div class="item">
@@ -44,26 +44,72 @@
 			<h4>选项D</h4>
 			<div class="menu">
 				<span></span>
-        <span></span>
-        <span></span>
+		        <span></span>
+		        <span></span>
 			</div>
-		</div>
+		</div> -->
 	</div>
 
 	<script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 	<script>
 		$(function () {
-			$(document).on("touchstart", ".list .item", function (e) {
+			var isdrag = false;  //是否移动
+			var touchY = 0;  // 记录按下的起始位置
+			var moveY = 0;	// 元素移动的位置
+			var offsetY = 0;	// 按下时偏移的位置
+			var lastMoveY = null;  // 记录最后移动到的位置
+			var tempTranslateY = null  // 记录移动后的值
+
+			$(document).on("touchstart", ".item", function (e) {
+				isdrag = true;
+				touchY = e.originalEvent.targetTouches[0].pageY
+				// console.log(touchY)
+
+				offsetY = touchY - $(this).offset().top;
+				// console.log(offsetY)
+
 				$(this).addClass("moving").siblings().addClass("disable");
 			})
 
 
-			$(document).on("touchmove", ".list .item", function (e) {
-				console.log(e)
+			$(document).on("touchmove", ".item", function (e) {
+				moveY = e.originalEvent.targetTouches[0].pageY;
+
+				// 用容器的大小减去移动元素的大小就是可移动范围
+				// var maxX = $(".list").innerWidth() - $(this).outerWidth();
+				// var maxY = $(".list").innerHeight() - $(this).outerHeight();
+
+				// moveX = Math.min(maxX, Math.max(0, moveX-touchX));
+				// moveY = Math.min(Math.max(0, moveY-touchY), );
+
+
+				// 向上移动时
+				// moveY = Math.min(moveY-touchY, $(this).position().top);
+				// console.log(moveY)
+				// 向下移动时
+				// moveY = Math.max(moveY-touchY, $(".list").innerHeight()-$(this).outerHeight()+$(this).position().top);
+
+				// moveY = Math.min($(".list").innerHeight()-$(this).outerHeight()+$(this).offset().top, Math.max(0, moveY-touchY));
+
+
+				// 限制移动范围
+				if(moveY-offsetY < $(".list").offset().top || moveY+$(this).outerHeight()-offsetY > $(".list").offset().top+$(".list").outerHeight()){
+					return;
+				}
+
+				if (isdrag === true) {
+					// 获取滑动方向
+					moveY = moveY - touchY;
+
+					$(this).css({"transform": `translateY(${lastMoveY+moveY}px)`})
+				}
+				tempTranslateY = lastMoveY+moveY
 			})
 
 
-			$(document).on("touchend", ".list .item", function (e) {
+			$(document).on("touchend", ".item", function (e) {
+				isdrag = false;
+				lastMoveY = tempTranslateY
 				$(this).removeClass("moving").siblings().removeClass("disable");
 			})
 		})

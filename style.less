@@ -6,6 +6,7 @@ body{
 	margin: 0;
 }
 .list{
+	position: relative;
 	width: 100%;
 	margin-top: 150px;
 	border-top: 1px solid #ddd;
@@ -16,7 +17,6 @@ body{
 		align-items: center;
 		padding: 15px 20px;
 		border-bottom: 1px solid #ddd;
-		transition: .3s;
 		.num{
 			display: flex;
 			justify-content: center;
@@ -62,6 +62,7 @@ body{
 		&.moving{
 			background: #8989ff;
 			box-shadow: 0 0 10px 0 #ccc;
+			transition: background box-shadow .3s;
 			.num{
 				background: #fff;
 				color: blue;
