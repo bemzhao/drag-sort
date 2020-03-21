@@ -8,7 +8,7 @@
 	<title>拖拽排序</title>
 	<link rel="stylesheet/less" href="style.less">
 	<script src="http://cdn.bootcss.com/less.js/2.5.3/less.min.js" ></script>
-	<script>less.watch();</script>
+	<!-- <script>less.watch();</script> -->
 </head>
 <body>
 	<div class="list">
@@ -21,7 +21,7 @@
         <span></span>
 			</div>
 		</div>
-		<div class="item moving">
+		<div class="item">
 			<div class="num">2</div>
 			<h4>选项B</h4>
 			<div class="menu">
@@ -30,7 +30,7 @@
         <span></span>
 			</div>
 		</div>
-		<div class="item disable">
+		<div class="item">
 			<div class="num">3</div>
 			<h4>选项C</h4>
 			<div class="menu">
@@ -49,5 +49,24 @@
 			</div>
 		</div>
 	</div>
+
+	<script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+	<script>
+		$(function () {
+			$(document).on("touchstart", ".list .item", function (e) {
+				$(this).addClass("moving").siblings().addClass("disable");
+			})
+
+
+			$(document).on("touchmove", ".list .item", function (e) {
+				console.log(e)
+			})
+
+
+			$(document).on("touchend", ".list .item", function (e) {
+				$(this).removeClass("moving").siblings().removeClass("disable");
+			})
+		})
+	</script>
 </body>
 </html>
