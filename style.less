@@ -4,14 +4,20 @@
 body{
 	padding: 0;
 	margin: 0;
+	background: #eee;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
 }
 .list{
 	position: relative;
 	width: 100%;
-	margin-top: 150px;
 	border-top: 1px solid #ddd;
 	-webkit-user-select: none;
 	user-select: none;
+	background: #fff;
 	.item{
 		display: flex;
 		align-items: center;
@@ -62,6 +68,8 @@ body{
 		&.moving{
 			background: #8989ff;
 			box-shadow: 0 0 10px 0 #ccc;
+			position: relative;
+			z-index: 1;
 			transition: background box-shadow .3s;
 			.num{
 				background: #fff;
@@ -72,21 +80,25 @@ body{
 					&:before{
 						background: #fff;
 						transform: rotate(-35deg) translateX(2px);
+						transition: .3s;
 					}
 					&:after{
 						background: #fff;
 						transform: rotate(35deg) translateX(-2px);
+						transition: .3s;
 					}
 				}
 				&:last-child{
 					margin: 5px 0 0;
 					&:before{
 						background: #fff;
-						transform: rotate(-145deg) translateX(-2px);
+						transform: rotate(35deg) translateX(2px);
+						transition: .3s;
 					}
 					&:after{
 						background: #fff;
-						transform: rotate(145deg) translateX(2px);
+						transform: rotate(-35deg) translateX(-2px);
+						transition: .3s;
 					}
 				}
 				&:nth-child(2){
@@ -99,7 +111,8 @@ body{
 				background: #ccc;
 			}
 			.menu{
-				display: none;
+				opacity: 0;
+				transition: .3s;
 			}
 		}
 	}
