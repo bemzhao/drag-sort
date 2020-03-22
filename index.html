@@ -94,6 +94,7 @@
 				var maxY = $(".list").outerHeight() - $(this).innerHeight()
 				if ($(this).index() === 0) {
 					// 第一个item的移动
+					// min取向下移动的最大距离，max取向上移动的最大距离
 					moveY = Math.min(Math.max(0, moveY), maxY)
 				} else {
 					// 其他item的移动
@@ -164,12 +165,14 @@
 				// 用索引去更新实际位置
 				setTimeout(() => {
 					if (direction === "down") {
-							$(".list .item").eq(moveIndex+$(this).index()).after($(this));
+						$(".list .item").eq(moveIndex+$(this).index()).after($(this));
 					} else {
-							$(".list .item").eq(moveIndex+$(this).index()).before($(this));
+						$(".list .item").eq(moveIndex+$(this).index()).before($(this));
 					}
 					moveIndex = 0;
 					$(".list .item").attr("style", "");
+
+					$(".list .item").each((index, ele) => $(ele).find(".num").text(index+1));
 				},300)
 			}
 
