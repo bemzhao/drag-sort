@@ -1,0 +1,117 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  padding: 0;
+  margin: 0;
+  background: #eee;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.list {
+  position: relative;
+  width: 100%;
+  border-top: 1px solid #ddd;
+  -webkit-user-select: none;
+  user-select: none;
+  background: #fff;
+}
+.list .item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+.list .item .num {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 20px;
+  max-width: 20px;
+  height: 20px;
+  margin: 0 20px 0 0;
+  background: blue;
+  font-size: 14px;
+  color: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+.list .item h4 {
+  flex: 1;
+  margin: 0;
+}
+.list .item .menu {
+  width: 20px;
+}
+.list .item .menu span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: gray;
+  margin: 0 0 4px;
+}
+.list .item .menu span:first-child,
+.list .item .menu span:last-child {
+  background: transparent;
+  display: flex;
+}
+.list .item .menu span:first-child:before,
+.list .item .menu span:last-child:before,
+.list .item .menu span:first-child:after,
+.list .item .menu span:last-child:after {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 2px;
+  background: gray;
+}
+.list .item .menu span:last-child {
+  margin: 0;
+}
+.list .item.moving {
+  background: #8989ff;
+  box-shadow: 0 0 10px 0 #ccc;
+  position: relative;
+  z-index: 1;
+  transition: background box-shadow 0.3s;
+}
+.list .item.moving .num {
+  background: #fff;
+  color: blue;
+}
+.list .item.moving .menu span:first-child:before {
+  background: #fff;
+  transform: rotate(-35deg) translateX(2px);
+  transition: 0.3s;
+}
+.list .item.moving .menu span:first-child:after {
+  background: #fff;
+  transform: rotate(35deg) translateX(-2px);
+  transition: 0.3s;
+}
+.list .item.moving .menu span:last-child {
+  margin: 5px 0 0;
+}
+.list .item.moving .menu span:last-child:before {
+  background: #fff;
+  transform: rotate(35deg) translateX(2px);
+  transition: 0.3s;
+}
+.list .item.moving .menu span:last-child:after {
+  background: #fff;
+  transform: rotate(-35deg) translateX(-2px);
+  transition: 0.3s;
+}
+.list .item.moving .menu span:nth-child(2) {
+  display: none;
+}
+.list .item.disable .num {
+  background: #ccc;
+}
+.list .item.disable .menu {
+  opacity: 0;
+  transition: 0.3s;
+}
