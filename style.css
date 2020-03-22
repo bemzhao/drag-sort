@@ -45,6 +45,7 @@ body {
 }
 .list .item .menu {
   width: 20px;
+  transition: 0.3s;
 }
 .list .item .menu span {
   display: block;
@@ -113,5 +114,4 @@ body {
 }
 .list .item.disable .menu {
   opacity: 0;
-  transition: 0.3s;
 }
