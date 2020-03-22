@@ -57,17 +57,19 @@
 			var touchY = 0;  // 记录按下的起始位置
 			var moveY = 0;	// 元素移动的位置
 			var offsetY = 0;	// 按下时偏移的位置
-			// var lastMoveY = null;  // 记录最后移动到的位置
+			var lastMoveY = null;  // 记录最后移动到的位置
 			// var tempTranslateY = null  // 记录移动后的值
 
-			var thisItemtop = 0;  // 当前item距离父元素顶部的高度
+			var thisItemPosTop = 0;  // 当前item距离父元素顶部的高度
 			var itemHeight = $(".item").outerHeight();  // item的高度
 			var moveIndex = 0  //当前item移动的索引
-			var direction = null; 
+			var direction = null;  // 移动方向
+			var isback = false;  // 移动是否回去了
 
 			$(".item").on("touchstart", dragStart);
       $(".item").on("touchmove", dragMove);
       $(".item").on("touchend", dragEnd);
+
 
 			function dragStart (e) {
 				e.preventDefault();
@@ -79,7 +81,7 @@
 				$(this).addClass("moving").siblings().addClass("disable");
 
 				if ($(this).index() !== 0) {
-					thisItemtop = $(this).position().top;
+					thisItemPosTop = $(this).position().top;
 				}
 			}
 
@@ -96,31 +98,58 @@
 					moveY = Math.min(Math.max(0, moveY), maxY)
 				} else {
 					// 其他item的移动
-					moveY = Math.min(Math.max(-thisItemtop, moveY), maxY-thisItemtop)
+					moveY = Math.min(Math.max(-thisItemPosTop, moveY), maxY-thisItemPosTop)
 				}
 
+				// 改变当前拖拽的item位置
 				if (isdrag === true) {
-					$(this).css({"transform": `translateY(${moveY}px)`})
+					$(this).css({"transform": `translate3d(0, ${moveY}px, 0)`})
 				}
-
-				// console.log(moveY)
 				
 				// 判断滑动方向
+				// 移动了多少个索引加上自身的索引就是需要变化的那个索引
 				if (moveY > 0) {
 					direction = "down"
 					moveIndex = Math.floor((Math.abs(moveY)+offsetY)/itemHeight);
 					$(".list .item").eq(moveIndex+$(this).index()).not(this).css({
-						"transform": `translateY(${-itemHeight}px)`,
+						"transform": `translate3d(0, ${-itemHeight}px, 0)`,
 						"transition": ".3s"
 					})
 				} else {
 					direction = "up"
 					moveIndex = -Math.floor((Math.abs(moveY)+offsetY)/itemHeight);
 					$(".list .item").eq(moveIndex+$(this).index()).not(this).css({
-						"transform": `translateY(${itemHeight}px)`,
+						"transform": `translate3d(0, ${itemHeight}px, 0)`,
 						"transition": ".3s"
 					})
 				}
+				
+				// 移动回原位时不改变位置
+				if (lastMoveY == moveY) {
+					return;
+				}
+				// 判断上滑还是下滑
+				if (lastMoveY > moveY) {
+					// console.log("向上")
+					if (direction === "down") {
+						console.log("目前的索引"+(moveIndex+$(this).index()))
+						$(".list .item").eq(moveIndex+$(this).index()+1).not(this).stop().css({
+							"transform": `translate3d(0, 0, 0)`,
+							"transition": ".3s"
+						})
+					}
+				} else{
+					// console.log("向下")
+					if (direction === "up") {
+						$(".list .item").eq(moveIndex+$(this).index()-1).not(this).stop().css({
+							"transform": `translate3d(0, 0, 0)`,
+							"transition": ".3s"
+						})
+					}
+				}
+
+				lastMoveY = moveY
+
 			}
 
 
@@ -131,7 +160,7 @@
 
 				// 设置当前的item的位置
 				$(this).css({
-					"transform": `translateY(${moveIndex*itemHeight}px)`,
+					"transform": `translate3d(0, ${moveIndex*itemHeight}px, 0)`,
 					"transition": ".3s"
 				})
 
@@ -143,11 +172,11 @@
 							$(".list .item").eq(moveIndex+$(this).index()).before($(this));
 					}
 					moveIndex = 0;
+					isback = false;
 					$(".list .item").attr("style", "");
 				},300)
 				
 			}
-
 
 		})
 	</script>
