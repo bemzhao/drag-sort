@@ -6,13 +6,15 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="renderer" content="webkit">
 	<title>拖拽排序</title>
-	<!-- <link rel="stylesheet/less" href="style.less">
-	<script src="http://cdn.bootcss.com/less.js/2.5.3/less.min.js" ></script> -->
-	<!-- <script>less.watch();</script> -->
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet/less" href="style.less">
+	<script src="http://cdn.bootcss.com/less.js/2.5.3/less.min.js" ></script>
+	<script>less.watch();</script>
+	<!-- <link rel="stylesheet" href="style.css"> -->
 </head>
 <body>
-	<div class="list">
+	<button type="button" class="addItem">新增</button>
+
+	<div id="list" class="list">
 		<div class="item">
 			<div class="num">1</div>
 			<h4>选项A</h4>
@@ -54,6 +56,18 @@
 	<script src="jquery-2.1.1.min.js"></script>
 	<script src="drag.js"></script>
 	<script>
+		$(document).on("click", ".addItem", function () {
+			$(".list").append(`<div class="item">
+				<div class="num">1</div>
+				<h4>选项A</h4>
+				<div class="menu" style="">
+					<span></span>
+	        <span></span>
+	        <span></span>
+				</div>
+			</div>`)
+		})
+		// console.log($(".list").children())
 		new Drag(".list");
 	</script>
 </body>

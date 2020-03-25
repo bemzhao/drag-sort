@@ -21,7 +21,12 @@ class Drag {
   	$(this.item).on("touchend", this.dragEnd.bind(this, event));
   }
 
+  test () {
+  	console.log($(this))
+  }
+
   dragStart () {
+  	console.log(event)
   	if (this.isStart === 0) {
 	  	event.preventDefault();
 

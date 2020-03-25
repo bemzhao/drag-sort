@@ -1,5 +1,6 @@
 *{
 	box-sizing: border-box;
+	touch-action: pan-y;
 }
 body{
 	padding: 0;
@@ -14,15 +15,38 @@ body{
 .list{
 	position: relative;
 	width: 100%;
-	border-top: 1px solid #ddd;
 	-webkit-user-select: none;
 	user-select: none;
 	background: #fff;
+	&:before{
+		content: ' ';
+		position: absolute;
+		box-sizing: border-box;
+		pointer-events: none;
+		top: -50%;
+		right: -50%;
+		bottom: -50%;
+		left: -50%;
+		border-top: 1px solid #ddd;
+		transform: scale(0.5);
+	}
 	.item{
+		position: relative;
 		display: flex;
 		align-items: center;
 		padding: 15px 20px;
-		border-bottom: 1px solid #ddd;
+		&:after{
+			content: ' ';
+			position: absolute;
+			box-sizing: border-box;
+			pointer-events: none;
+			top: -50%;
+			right: -50%;
+			bottom: -50%;
+			left: -50%;
+			border-top: 1px solid #ddd;
+			transform: scale(0.5);
+		}
 		.num{
 			display: flex;
 			justify-content: center;
