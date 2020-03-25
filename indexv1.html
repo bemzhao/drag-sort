@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="renderer" content="webkit">
+	<title>拖拽排序</title>
+	<!-- <link rel="stylesheet/less" href="style.less"> -->
+	<!-- <script src="http://cdn.bootcss.com/less.js/2.5.3/less.min.js" ></script> -->
+	<!-- <script>less.watch();</script> -->
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="list">
+		<div class="item">
+			<div class="num">1</div>
+			<h4>选项A</h4>
+			<div class="menu" style="">
+				<span></span>
+        <span></span>
+        <span></span>
+			</div>
+		</div>
+		<div class="item">
+			<div class="num">2</div>
+			<h4>选项B</h4>
+			<div class="menu">
+				<span></span>
+		    <span></span>
+		    <span></span>
+			</div>
+		</div>
+		<div class="item">
+			<div class="num">3</div>
+			<h4>选项C</h4>
+			<div class="menu">
+				<span></span>
+		    <span></span>
+		    <span></span>
+			</div>
+		</div>
+		<div class="item">
+			<div class="num">4</div>
+			<h4>选项D</h4>
+			<div class="menu">
+				<span></span>
+		    <span></span>
+		    <span></span>
+			</div>
+		</div>
+	</div>
+
+	<script src="jquery-2.1.1.min.js"></script>
+	<script>
+		$(function () {
+			var isStart = 0;														// 是否开始 0未滚动 1滚动中 2滚动完成
+			var isdrag = false;  												// 是否移动
+			var touchY = 0;  														// 记录按下的起始位置
+			var moveY = 0;															// 元素移动的位置
+			var offsetY = 0;														// 按下时偏移的位置
+			var lastMoveY = null;  											// 记录最后移动到的位置
+			var thisItemPosTop = 0;  										// 当前item距离父元素顶部的高度
+			var itemHeight = $(".item").outerHeight();  // item的高度
+			var moveIndex = 0  													// 当前item移动的索引
+			var direction = null;  											// 移动方向
+
+			$(".item").on("touchstart", dragStart);
+      $(".item").on("touchmove", dragMove);
+      $(".item").on("touchend", dragEnd);
+
+
+			function dragStart (e) {
+				if (isStart === 0) {
+					// 记录初始位置和偏移的值
+					e.preventDefault();
+					isdrag = true;
+					isStart = 1;
+					touchY = e.originalEvent.targetTouches[0].pageY
+
+					offsetY = touchY - $(this).offset().top;
+
+					$(this).addClass("moving").siblings().addClass("disable");
+
+					if ($(this).index() !== 0) {
+						thisItemPosTop = $(this).position().top;
+					}
+				}
+			}
+
+
+			function dragMove (e) {
+				if (isStart === 1) {
+					e.preventDefault();
+					// 移动时产生的距离
+					moveY = e.originalEvent.targetTouches[0].pageY - touchY;
+
+					// 限制移动范围
+					var maxY = $(".list").outerHeight() - $(this).innerHeight()
+					if ($(this).index() === 0) {
+						// 第一个item的移动
+						// min取向下移动的最大距离，max取向上移动的最大距离
+						moveY = Math.min(Math.max(0, moveY), maxY)
+					} else {
+						// 其他item的移动
+						moveY = Math.min(Math.max(-thisItemPosTop, moveY), maxY-thisItemPosTop)
+					}
+
+					// 改变当前拖拽的item位置
+					if (isdrag === true) {
+						$(this).css({"transform": `translate3d(0, ${moveY}px, 0)`})
+					}
+					
+					// 判断滑动方向
+					// 移动了多少个索引加上自身的索引就是需要变化的那个索引
+					if (moveY > 0) {
+						direction = "down"
+						moveIndex = Math.floor((Math.abs(moveY)+offsetY)/itemHeight);
+						$(".list .item").eq(moveIndex+$(this).index()).not(this).css({
+							"transform": `translate3d(0, ${-itemHeight}px, 0)`,
+							"transition": ".3s"
+						})
+					} else {
+						direction = "up"
+						moveIndex = -Math.floor((Math.abs(moveY)+offsetY)/itemHeight);
+						$(".list .item").eq(moveIndex+$(this).index()).not(this).css({
+							"transform": `translate3d(0, ${itemHeight}px, 0)`,
+							"transition": ".3s"
+						})
+					}
+					
+					// 移动回原位时不改变位置
+					if (lastMoveY == moveY) {
+						return;
+					}
+					// 判断上滑还是下滑
+					if (lastMoveY > moveY) {
+						// console.log("向上")
+						if (direction === "down") {
+							$(".list .item").eq(moveIndex+$(this).index()+1).not(this).stop().css({
+								"transform": `translate3d(0, 0, 0)`,
+								"transition": ".3s"
+							})
+						}
+					} else{
+						// console.log("向下")
+						if (direction === "up") {
+							$(".list .item").eq(moveIndex+$(this).index()-1).not(this).stop().css({
+								"transform": `translate3d(0, 0, 0)`,
+								"transition": ".3s"
+							})
+						}
+					}
+
+					lastMoveY = moveY
+				}
+			}
+
+
+			function dragEnd (e) {
+				if (isStart === 1) {
+					e.preventDefault();
+					isdrag = false;
+					$(this).removeClass("moving").siblings().removeClass("disable");
+
+					// 设置当前的item的位置
+					$(this).css({
+						"transform": `translate3d(0, ${moveIndex*itemHeight}px, 0)`,
+						"transition": ".3s"
+					})
+
+					// 用索引去更新实际位置
+					setTimeout(() => {
+						if (direction === "down") {
+							$(".list .item").eq(moveIndex+$(this).index()).after($(this));
+						} else {
+							$(".list .item").eq(moveIndex+$(this).index()).before($(this));
+						}
+
+						$(".list .item").attr("style", "");
+						$(".list .item").each((index, ele) => $(ele).find(".num").text(index+1));
+
+						moveIndex = 0;
+						isStart = 0;
+					},300)
+				}
+			}
+
+		})
+	</script>
+</body>
+</html>
