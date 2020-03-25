@@ -67,8 +67,11 @@
 				</div>
 			</div>`)
 		})
-		// console.log($(".list").children())
-		new Drag(".list");
+
+		new Drag({
+			parent: ".list", 
+			item: ".item"
+		});
 	</script>
 </body>
 </html>

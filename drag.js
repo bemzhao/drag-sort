@@ -1,7 +1,7 @@
 class Drag {
-  constructor(parent) {
+  constructor({parent, item}) {
   	this.parent = parent;													// 父容器
-  	this.item = $(this.parent).children();				// 拖动的元素
+  	this.item = item;															// 拖动的元素
   	this.isStart = 0;															// 是否开始 0未滚动 1滚动中 2滚动完成
     this.isdrag = false;  												// 是否移动
 		this.touchY = 0;  														// 记录按下的起始位置
@@ -16,26 +16,29 @@ class Drag {
   }
 
   init () {
-  	$(this.item).on("touchstart", this.dragStart.bind(this, event));
-  	$(this.item).on("touchmove", this.dragMove.bind(this, event));
-  	$(this.item).on("touchend", this.dragEnd.bind(this, event));
+  	var that = this;
+
+  	$(this.parent).on("touchstart", this.item, function(event){
+  		that.dragStart(this, event)
+  	});
+  	$(this.parent).on("touchmove", this.item, function(event){
+  		that.dragMove(this, event)
+  	});
+  	$(this.parent).on("touchend", this.item, function(event){
+  		that.dragEnd(this, event)
+  	});
   }
 
-  test () {
-  	console.log($(this))
-  }
-
-  dragStart () {
-  	console.log(event)
+  dragStart (item, event) {
   	if (this.isStart === 0) {
 	  	event.preventDefault();
 
-	  	var this_item = $(event.currentTarget);
+	  	var this_item = $(item);
 
 			// 记录初始位置和偏移的值
 			this.isdrag = true;
 			this.isStart = 1;
-			this.touchY = event.targetTouches[0].pageY;
+			this.touchY = event.originalEvent.touches[0].pageY;
 
 			this.offsetY = this.touchY - this_item.offset().top;
 
@@ -48,14 +51,14 @@ class Drag {
 	}
 
 
-  dragMove () {
+  dragMove (item, event) {
   	if (this.isStart === 1) {
 			event.preventDefault();
 
-			var this_item = $(event.currentTarget);
+			var this_item = $(item);
 
 			// 移动时产生的距离
-			this.moveY = event.targetTouches[0].pageY - this.touchY;
+			this.moveY = event.originalEvent.touches[0].pageY - this.touchY;
 
 			// 限制移动范围
 			var maxY = $(this.parent).outerHeight() - this_item.innerHeight()
@@ -119,11 +122,11 @@ class Drag {
 	}
 
 
-	dragEnd () {
+	dragEnd (item, event) {
 		if (this.isStart === 1) {
 			event.preventDefault();
 
-			var this_item = $(event.currentTarget);
+			var this_item = $(item);
 
 			this.isStart = 2;
 			this.isdrag = false;
