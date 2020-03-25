@@ -6,10 +6,11 @@ class Drag {
     this.isdrag = false;  												// 是否移动
 		this.touchY = 0;  														// 记录按下的起始位置
 		this.moveY = 0;																// 元素移动的位置
-		this.offsetY = 0;															// 按下时偏移的位置
-		this.lastMoveY = null;  											// 记录最后移动到的位置
+		this.offsetY = 0;															// 按下时距离元素顶部的偏移距离
+		this.lastMoveY = 0;  													// 记录最后移动到的位置
 		this.thisItemPosTop = 0;  										// 当前item距离父元素顶部的高度
-		this.itemHeight = $(this.item).outerHeight(); // item的高度
+		this.thisItemHeight = 0; 											// 当前点击到的元素的高度
+		this.moveHeight = 0;													// 拖拽元素改变其他元素的所需要的高度
 		this.moveIndex = 0  													// 当前item移动的索引
 		this.direction = null;  											// 移动方向
 		this.init();
@@ -34,6 +35,9 @@ class Drag {
 	  	event.preventDefault();
 
 	  	var this_item = $(item);
+
+	  	this.thisItemHeight = this_item.outerHeight();
+	  	this.moveHeight = $(this.parent).innerHeight()/$(this.parent).children().length;
 
 			// 记录初始位置和偏移的值
 			this.isdrag = true;
@@ -80,16 +84,16 @@ class Drag {
 			// 移动了多少个索引加上自身的索引就是需要变化的那个索引
 			if (this.moveY > 0) {
 				this.direction = "down"
-				this.moveIndex = Math.floor((Math.abs(this.moveY)+this.offsetY)/this.itemHeight);
+				this.moveIndex = Math.floor((Math.abs(this.moveY)+this.offsetY)/this.moveHeight);
 				$(this.parent).children().eq(this.moveIndex+this_item.index()).not(this_item).css({
-					"transform": `translate3d(0, ${-this.itemHeight}px, 0)`,
+					"transform": `translate3d(0, ${-this.thisItemHeight}px, 0)`,
 					"transition": ".3s"
 				})
 			} else {
 				this.direction = "up"
-				this.moveIndex = -Math.floor((Math.abs(this.moveY)+this.offsetY)/this.itemHeight);
+				this.moveIndex = -Math.floor((Math.abs(this.moveY)+this.offsetY)/this.moveHeight);
 				$(this.parent).children().eq(this.moveIndex+this_item.index()).not(this_item).css({
-					"transform": `translate3d(0, ${this.itemHeight}px, 0)`,
+					"transform": `translate3d(0, ${this.thisItemHeight}px, 0)`,
 					"transition": ".3s"
 				})
 			}
@@ -132,11 +136,21 @@ class Drag {
 			this.isdrag = false;
 			this_item.removeClass("moving").siblings().removeClass("disable");
 
-			// 设置当前的item的位置
-			this_item.css({
-				"transform": `translate3d(0, ${this.moveIndex*this.itemHeight}px, 0)`,
-				"transition": ".3s"
-			})
+			//获取移动前的下标到移动后的下标之间的所有元素高度即是 tranlateY 的值
+			let mheight = this.getItemHeight(this.direction, this_item.index(), this.moveIndex+this_item.index())
+			if (this.moveIndex + this_item.index() > this_item.index()) {
+				// 向下滑动
+				this_item.css({
+					"transform": `translate3d(0, ${mheight}px, 0)`,
+					"transition": ".3s"
+				})
+			} else {
+				// 向上滑动
+				this_item.css({
+					"transform": `translate3d(0, ${-mheight}px, 0)`,
+					"transition": ".3s"
+				})
+			}
 
 			// 用索引去更新实际位置
 			setTimeout(() => {
@@ -153,6 +167,21 @@ class Drag {
 				this.isStart = 0;
 			},300)
 		}
+	}
+
+	// 获取元素原本的下标到滑到的下标的总距离
+	getItemHeight (direction, startIndex, endIndex) {
+		let totalHeight = 0;
+		if (direction === "down") {
+			for (let i = startIndex+1; i <= endIndex; i++) {
+				totalHeight += $(this.parent).children().eq(i).outerHeight();
+			}
+		} else {
+			for (let i = endIndex; i < startIndex; i++) {
+				totalHeight += $(this.parent).children().eq(i).outerHeight();
+			}
+		}
+		return totalHeight;
 	}
 	
 }
