@@ -35,9 +35,10 @@ class Drag {
 	  	event.preventDefault();
 
 	  	var this_item = $(item);
+	  	var this_parent = $(this.parent);
 
 	  	this.thisItemHeight = this_item.outerHeight();
-	  	this.moveHeight = $(this.parent).innerHeight()/$(this.parent).children().length;
+	  	this.moveHeight = this_parent.innerHeight()/this_parent.children().length;
 
 			// 记录初始位置和偏移的值
 			this.isdrag = true;
@@ -60,12 +61,13 @@ class Drag {
 			event.preventDefault();
 
 			var this_item = $(item);
+			var this_parent = $(this.parent);
 
 			// 移动时产生的距离
 			this.moveY = event.originalEvent.touches[0].pageY - this.touchY;
 
 			// 限制移动范围
-			var maxY = $(this.parent).outerHeight() - this_item.innerHeight()
+			var maxY = this_parent.outerHeight() - this_item.innerHeight()
 			if (this_item.index() === 0) {
 				// 第一个item的移动
 				// min取向下移动的最大距离，max取向上移动的最大距离
@@ -85,14 +87,14 @@ class Drag {
 			if (this.moveY > 0) {
 				this.direction = "down"
 				this.moveIndex = Math.floor((Math.abs(this.moveY)+this.offsetY)/this.moveHeight);
-				$(this.parent).children().eq(this.moveIndex+this_item.index()).not(this_item).css({
+				this_parent.children().eq(this.moveIndex+this_item.index()).not(this_item).css({
 					"transform": `translate3d(0, ${-this.thisItemHeight}px, 0)`,
 					"transition": ".3s"
 				})
 			} else {
 				this.direction = "up"
 				this.moveIndex = -Math.floor((Math.abs(this.moveY)+this.offsetY)/this.moveHeight);
-				$(this.parent).children().eq(this.moveIndex+this_item.index()).not(this_item).css({
+				this_parent.children().eq(this.moveIndex+this_item.index()).not(this_item).css({
 					"transform": `translate3d(0, ${this.thisItemHeight}px, 0)`,
 					"transition": ".3s"
 				})
@@ -106,7 +108,7 @@ class Drag {
 			if (this.lastMoveY > this.moveY) {
 				// console.log("向上")
 				if (this.direction === "down") {
-					$(this.parent).children().eq(this.moveIndex+this_item.index()+1).not(this_item).stop().css({
+					this_parent.children().eq(this.moveIndex+this_item.index()+1).not(this_item).stop().css({
 						"transform": `translate3d(0, 0, 0)`,
 						"transition": ".3s"
 					})
@@ -114,7 +116,7 @@ class Drag {
 			} else{
 				// console.log("向下")
 				if (this.direction === "up") {
-					$(this.parent).children().eq(this.moveIndex+this_item.index()-1).not(this_item).stop().css({
+					this_parent.children().eq(this.moveIndex+this_item.index()-1).not(this_item).stop().css({
 						"transform": `translate3d(0, 0, 0)`,
 						"transition": ".3s"
 					})
@@ -131,6 +133,7 @@ class Drag {
 			event.preventDefault();
 
 			var this_item = $(item);
+			var this_parent = $(this.parent);
 
 			this.isStart = 2;
 			this.isdrag = false;
@@ -155,13 +158,13 @@ class Drag {
 			// 用索引去更新实际位置
 			setTimeout(() => {
 				if (this.direction === "down") {
-					$(this.parent).children().eq(this.moveIndex+this_item.index()).after(this_item);
+					this_parent.children().eq(this.moveIndex+this_item.index()).after(this_item);
 				} else {
-					$(this.parent).children().eq(this.moveIndex+this_item.index()).before(this_item);
+					this_parent.children().eq(this.moveIndex+this_item.index()).before(this_item);
 				}
 
-				$(this.parent).children().attr("style", "");
-				$(this.parent).children().each((index, ele) => $(ele).find(".num").text(index+1));
+				this_parent.children().attr("style", "");
+				this_parent.children().each((index, ele) => $(ele).find(".num").text(index+1));
 
 				this.moveIndex = 0;
 				this.isStart = 0;
