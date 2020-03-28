@@ -33,13 +33,6 @@ class Drag {
   	$(this.parent).on("click", this.item, function(event){
   		that.handleClick(this, event)
   	});
-  	$(this.parent).on("dblclick", this.item, function(event){
-  		that.handleDblClick(this, event)
-  	});
-  }
-
-  handleClick (item, event) {
-  	clearTimeout(this.canDrag);
   }
 
   dragStart (item, event) {
@@ -68,9 +61,8 @@ class Drag {
 					this.thisItemPosTop = this_item.position().top;
 				}
 			}
-  	}, 100)
+  	}, 500)
 	}
-
 
   dragMove (item, event) {
   	if (this.isStart === -1) {
@@ -195,7 +187,6 @@ class Drag {
 		}
 	}
 
-
 	dragEnd (item, event) {
 		if (this.isStart === 1) {
 			event.preventDefault();
@@ -266,6 +257,9 @@ class Drag {
 		}
 	}
 
+	handleClick (item, event) {
+  	clearTimeout(this.canDrag);
+  }
 
 	/*
 		获取元素原本的下标到滑到的下标的总距离
@@ -286,7 +280,6 @@ class Drag {
 		}
 		return totalHeight;
 	}
-
 
 	/*
 		计算某个字段在数组中出现过多少次
