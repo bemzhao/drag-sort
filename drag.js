@@ -2,9 +2,9 @@ class Drag {
   constructor({parent, item}) {
   	this.parent = parent;									// 父容器
   	this.item = item;											// 拖动的元素
-  	this.isStart = -1;											// 是否开始 0未滚动 1滚动中 2滚动完成
+  	this.isStart = -1;										// 是否开始 0未滚动 1滚动中 2滚动完成
     this.isDrag = false;  								// 是否移动
-    this.canDrag = null;
+    this.canDrag = null;									// 定时器判断是滚动页面还是拖拽元素
 		this.touchY = 0;  										// 记录按下的起始位置
 		this.moveY = 0;												// 元素移动的位置
 		this.offsetY = 0;											// 按下时距离元素顶部的偏移距离
@@ -30,6 +30,20 @@ class Drag {
   	$(this.parent).on("touchend", this.item, function(event){
   		that.dragEnd(this, event)
   	});
+  	$(this.parent).on("click", this.item, function(event){
+  		that.handleClick(this, event)
+  	});
+  	$(this.parent).on("dblclick", this.item, function(event){
+  		that.handleDblClick(this, event)
+  	});
+  }
+
+  handleClick (item, event) {
+  	clearTimeout(this.canDrag);
+  }
+
+  handleDblClick (item, event) {
+  	clearTimeout(this.canDrag);
   }
 
   dragStart (item, event) {
@@ -41,9 +55,7 @@ class Drag {
 		  	var this_item = $(item);
 		  	var this_parent = $(this.parent);
 
-		  	this_item.css({
-		  		"pointer-events": "none"
-		  	})
+		  	this_item.css({"pointer-events": "none"})
 
 		  	this.thisItemHeight = this_item.outerHeight();
 
@@ -173,13 +185,20 @@ class Drag {
 			var this_item = $(item);
 			var this_parent = $(this.parent);
 
-			this_item.css({
-	  		"pointer-events": "auto"
-	  	})
+			this_item.css({"pointer-events": "auto"})
 
 			this.isStart = 2;
 			this.isDrag = false;
 			this_item.removeClass("moving").siblings().removeClass("disable");
+
+			if (this.direction === 'down') {
+				let downlast = $(this.item+'[data-move=-1]').last();
+				this_item.nextUntil(downlast, this.item).attr("data-move", "-1")
+			} else {
+				let uplast = $(this.item+'[data-move=1]').last();
+				this_item.prevUntil(uplast, this.item).attr("data-move", "1")
+			}
+			
 
 			// 计算有多少个 data-move
 			// 为 -1 就用 data-move 的个数加原有的元素本身的下标,为 1 就用原本的下标减 data-move 的个数
