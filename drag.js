@@ -42,10 +42,6 @@ class Drag {
   	clearTimeout(this.canDrag);
   }
 
-  handleDblClick (item, event) {
-  	clearTimeout(this.canDrag);
-  }
-
   dragStart (item, event) {
   	this.canDrag = setTimeout(()=>{
   		this.isStart = 0;
@@ -148,25 +144,38 @@ class Drag {
 		  	$(ele).attr("data-move", "1")
 			}
 			
-			// 触点第一次离开之后返回判断是向上还是向下
-			if (this.lastMoveY > this.moveY) {
-				// console.log("向上")
-				if (this.direction === "down") {
-					$(ele).css({
-			  		"transform": `translate3d(0, 0, 0)`,
-			  		"transition": ".3s"
-			  	})
-			  	$(ele).attr("data-move", "")
-				}
+			// 触点第一次离开之后返回都经过了同个元素判断是向上还是向下
+			if (this.direction === "down" && this.lastMoveY > this.moveY && $(ele).attr("data-move") === "-1") {
+				// console.log("原本向下现在向上")
+				$(ele).css({
+		  		"transform": `translate3d(0, 0, 0)`,
+		  		"transition": ".3s"
+		  	})
+		  	$(ele).attr("data-move", "")
 			}
-			if (this.lastMoveY < this.moveY) {
-				// console.log("向下")
+			if (this.direction === "up" && this.lastMoveY < this.moveY && $(ele).attr("data-move") === "1") {
+				// console.log("原本向上现在向下")
+				$(ele).css({
+		  		"transform": `translate3d(0, 0, 0)`,
+		  		"transition": ".3s"
+		  	})
+		  	$(ele).attr("data-move", "")
+			}
+
+			if (this.time !== null) {
+				if (this.direction === "down") {
+					this_item.nextUntil($(ele), this.item).css({
+						"transform": `translate3d(0, ${-this.thisItemHeight}px, 0)`,
+						"transition": ".3s"
+					})
+					this_item.nextUntil($(ele), this.item).attr("data-move", "-1")
+				}
 				if (this.direction === "up") {
-					$(ele).css({
-			  		"transform": `translate3d(0, 0, 0)`,
-			  		"transition": ".3s"
-			  	})
-			  	$(ele).attr("data-move", "")
+					this_item.prevUntil($(ele), this.item).css({
+						"transform": `translate3d(0, ${this.thisItemHeight}px, 0)`,
+						"transition": ".3s"
+					})
+					this_item.prevUntil($(ele), this.item).attr("data-move", "1")
 				}
 			}
 
@@ -179,9 +188,6 @@ class Drag {
 		if (this.isStart === 1) {
 			event.preventDefault();
 
-			clearInterval(this.time);
-			$('html, body').stop();
-
 			var this_item = $(item);
 			var this_parent = $(this.parent);
 
@@ -189,14 +195,19 @@ class Drag {
 
 			this.isStart = 2;
 			this.isDrag = false;
+			this.time = null
 			this_item.removeClass("moving").siblings().removeClass("disable");
 
 			if (this.direction === 'down') {
 				let downlast = $(this.item+'[data-move=-1]').last();
-				this_item.nextUntil(downlast, this.item).attr("data-move", "-1")
+				if (downlast.length > 0) {
+					this_item.nextUntil(downlast, this.item).attr("data-move", "-1")
+				}
 			} else {
 				let uplast = $(this.item+'[data-move=1]').last();
-				this_item.prevUntil(uplast, this.item).attr("data-move", "1")
+				if (uplast.length > 0) {
+					this_item.prevUntil(uplast, this.item).attr("data-move", "1")
+				}
 			}
 			
 
