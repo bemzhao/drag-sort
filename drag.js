@@ -1,17 +1,19 @@
 class Drag {
   constructor({parent, item}) {
-  	this.parent = parent;													// 父容器
-  	this.item = item;															// 拖动的元素
-  	this.isStart = 0;															// 是否开始 0未滚动 1滚动中 2滚动完成
-    this.isdrag = false;  												// 是否移动
-		this.touchY = 0;  														// 记录按下的起始位置
-		this.moveY = 0;																// 元素移动的位置
-		this.offsetY = 0;															// 按下时距离元素顶部的偏移距离
-		this.lastMoveY = 0;  													// 记录最后移动到的位置
-		this.thisItemPosTop = 0;  										// 当前item距离父元素顶部的高度
-		this.thisItemHeight = 0; 											// 当前点击到的元素的高度
-		this.moveIndex = 0  													// 当前item移动的索引
-		this.direction = null;  											// 移动方向
+  	this.parent = parent;									// 父容器
+  	this.item = item;											// 拖动的元素
+  	this.isStart = 0;											// 是否开始 0未滚动 1滚动中 2滚动完成
+    this.isdrag = false;  								// 是否移动
+		this.touchY = 0;  										// 记录按下的起始位置
+		this.moveY = 0;												// 元素移动的位置
+		this.offsetY = 0;											// 按下时距离元素顶部的偏移距离
+		this.lastMoveY = 0;  									// 记录最后移动到的位置
+		this.thisItemPosTop = 0;  						// 当前 item 距离父元素顶部的高度
+		this.thisItemHeight = 0; 							// 当前点击到的元素的高度
+		this.moveIndex = 0  									// 当前 item 移动的索引
+		this.direction = null;  							// 移动方向
+		this.time = null;											// 计时器，用于执行定时判断拖拽元素的位置
+		this.thisScrollTop = 0;								// 当前的滚动条高度
 		this.init();
   }
 
@@ -65,6 +67,24 @@ class Drag {
 			var this_item = $(item);
 			var this_parent = $(this.parent);
 
+			// 判断触点的 clientY 是在顶部还是在底部，然后再设置页面的滚动距离
+			var clientHeight = document.documentElement.clientHeight;
+			if (event.originalEvent.touches[0].clientY > clientHeight*.95) {
+				clearInterval(this.time)
+				this.time = setInterval(()=> {
+					this.thisScrollTop =  $(document).scrollTop();
+					$(document).scrollTop(this.thisScrollTop + 5);
+				},15)
+			} else if (event.originalEvent.touches[0].clientY < clientHeight*.05) {
+				clearInterval(this.time)
+				this.time = setInterval(()=> {
+					this.thisScrollTop =  $(document).scrollTop();
+					$(document).scrollTop(this.thisScrollTop - 5);
+				},15)
+			}else{
+				clearInterval(this.time)
+			}
+
 			// 移动时产生的距离
 			this.moveY = event.originalEvent.touches[0].pageY - this.touchY;
 
@@ -86,11 +106,12 @@ class Drag {
 			
 			// 判断滑动方向
 			// 通过获取手指的移动时产生的触点来获取触碰到的元素
-			let ele = document.elementFromPoint(event.originalEvent.touches[0].pageX, event.originalEvent.touches[0].pageY);
+			let ele = document.elementFromPoint(event.originalEvent.touches[0].clientX, event.originalEvent.touches[0].clientY);
 			if (!$(ele).hasClass(this.item.replace('.',''))) {
 				return false;
 			}
 
+			// 判断触点第一次离开的方向是向下还是向上
 			if (this.moveY > 0 && this_item.index() < $(ele).index()) {
 				this.direction = "down"
 		  	$(ele).css({
@@ -108,7 +129,7 @@ class Drag {
 		  	$(ele).attr("data-move", "1")
 			}
 			
-			// 判断上滑还是下滑
+			// 触点第一次离开之后返回判断是向上还是向下
 			if (this.lastMoveY > this.moveY) {
 				// console.log("向上")
 				if (this.direction === "down") {
@@ -138,6 +159,9 @@ class Drag {
 	dragEnd (item, event) {
 		if (this.isStart === 1) {
 			event.preventDefault();
+
+			clearInterval(this.time);
+			$('html, body').stop();
 
 			var this_item = $(item);
 			var this_parent = $(this.parent);
