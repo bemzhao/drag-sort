@@ -2,8 +2,9 @@ class Drag {
   constructor({parent, item}) {
   	this.parent = parent;									// 父容器
   	this.item = item;											// 拖动的元素
-  	this.isStart = 0;											// 是否开始 0未滚动 1滚动中 2滚动完成
-    this.isdrag = false;  								// 是否移动
+  	this.isStart = -1;											// 是否开始 0未滚动 1滚动中 2滚动完成
+    this.isDrag = false;  								// 是否移动
+    this.canDrag = null;
 		this.touchY = 0;  										// 记录按下的起始位置
 		this.moveY = 0;												// 元素移动的位置
 		this.offsetY = 0;											// 按下时距离元素顶部的偏移距离
@@ -32,35 +33,41 @@ class Drag {
   }
 
   dragStart (item, event) {
-  	if (this.isStart === 0) {
-	  	event.preventDefault();
+  	this.canDrag = setTimeout(()=>{
+  		this.isStart = 0;
+  		if (this.isStart === 0) {
+		  	event.preventDefault();
 
-	  	var this_item = $(item);
-	  	var this_parent = $(this.parent);
+		  	var this_item = $(item);
+		  	var this_parent = $(this.parent);
 
-	  	this_item.css({
-	  		"pointer-events": "none"
-	  	})
+		  	this_item.css({
+		  		"pointer-events": "none"
+		  	})
 
-	  	this.thisItemHeight = this_item.outerHeight();
+		  	this.thisItemHeight = this_item.outerHeight();
 
-			// 记录初始位置和偏移的值
-			this.isdrag = true;
-			this.isStart = 1;
-			this.touchY = event.originalEvent.touches[0].pageY;
+				// 记录初始位置和偏移的值
+				this.isDrag = true;
+				this.isStart = 1;
+				this.touchY = event.originalEvent.touches[0].pageY;
 
-			this.offsetY = this.touchY - this_item.offset().top;
+				this.offsetY = this.touchY - this_item.offset().top;
 
-			this_item.addClass("moving").siblings().addClass("disable");
+				this_item.addClass("moving").siblings().addClass("disable");
 
-			if (this_item.index() !== 0) {
-				this.thisItemPosTop = this_item.position().top;
+				if (this_item.index() !== 0) {
+					this.thisItemPosTop = this_item.position().top;
+				}
 			}
-		}
+  	}, 100)
 	}
 
 
   dragMove (item, event) {
+  	if (this.isStart === -1) {
+  		clearTimeout(this.canDrag);
+  	}
   	if (this.isStart === 1) {
 			event.preventDefault();
 
@@ -100,7 +107,7 @@ class Drag {
 			}
 
 			// 改变当前拖拽的item位置
-			if (this.isdrag === true) {
+			if (this.isDrag === true) {
 				this_item.css({"transform": `translate3d(0, ${this.moveY}px, 0)`})
 			}
 			
@@ -171,7 +178,7 @@ class Drag {
 	  	})
 
 			this.isStart = 2;
-			this.isdrag = false;
+			this.isDrag = false;
 			this_item.removeClass("moving").siblings().removeClass("disable");
 
 			// 计算有多少个 data-move
@@ -210,7 +217,7 @@ class Drag {
 				this_parent.children().each((index, ele) => $(ele).find(".num").text(index+1));
 
 				this.moveIndex = 0;
-				this.isStart = 0;
+				this.isStart = -1;
 			},300)
 		}
 	}
