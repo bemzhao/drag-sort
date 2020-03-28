@@ -132,16 +132,14 @@ class Drag {
 		  	$(ele).css({
 		  		"transform": `translate3d(0, ${-this.thisItemHeight}px, 0)`,
 		  		"transition": ".3s"
-		  	})
-		  	$(ele).attr("data-move", "-1")
+		  	}).attr("data-move", "-1")
 			} 
 			if (this.moveY < 0 && this_item.index() > $(ele).index()) {
 				this.direction = "up"
 				$(ele).css({
 		  		"transform": `translate3d(0, ${this.thisItemHeight}px, 0)`,
 		  		"transition": ".3s"
-		  	})
-		  	$(ele).attr("data-move", "1")
+		  	}).attr("data-move", "1")
 			}
 			
 			// 触点第一次离开之后返回都经过了同个元素判断是向上还是向下
@@ -150,16 +148,14 @@ class Drag {
 				$(ele).css({
 		  		"transform": `translate3d(0, 0, 0)`,
 		  		"transition": ".3s"
-		  	})
-		  	$(ele).attr("data-move", "")
+		  	}).attr("data-move", "")
 			}
 			if (this.direction === "up" && this.lastMoveY < this.moveY && $(ele).attr("data-move") === "1") {
 				// console.log("原本向上现在向下")
 				$(ele).css({
 		  		"transform": `translate3d(0, 0, 0)`,
 		  		"transition": ".3s"
-		  	})
-		  	$(ele).attr("data-move", "")
+		  	}).attr("data-move", "")
 			}
 
 			if (this.time !== null) {
@@ -169,6 +165,14 @@ class Drag {
 						"transition": ".3s"
 					})
 					this_item.nextUntil($(ele), this.item).attr("data-move", "-1")
+					$(this.item).each((index, ele) => {
+						if ($(ele).attr('data-move') === "1") {
+							$(ele).css({
+								"transform": `translate3d(0, 0, 0)`,
+								"transition": ".3s"
+							}).attr("data-move", "")
+						}
+					})
 				}
 				if (this.direction === "up") {
 					this_item.prevUntil($(ele), this.item).css({
@@ -176,6 +180,14 @@ class Drag {
 						"transition": ".3s"
 					})
 					this_item.prevUntil($(ele), this.item).attr("data-move", "1")
+					$(this.item).each((index, ele) => {
+						if ($(ele).attr('data-move') === "-1") {
+							$(ele).css({
+								"transform": `translate3d(0, 0, 0)`,
+								"transition": ".3s"
+							}).attr("data-move", "")
+						}
+					})
 				}
 			}
 
