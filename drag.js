@@ -84,13 +84,13 @@ class Drag {
 
 			// 判断触点的 clientY 是在顶部还是在底部，然后再设置页面的滚动距离
 			var clientHeight = document.documentElement.clientHeight;
-			if (event.originalEvent.touches[0].clientY > clientHeight*.95) {
+			if (event.originalEvent.touches[0].clientY > clientHeight*.9) {
 				clearInterval(this.time)
 				this.time = setInterval(()=> {
 					this.thisScrollTop =  $(document).scrollTop();
 					$(document).scrollTop(this.thisScrollTop + 5);
 				},15)
-			} else if (event.originalEvent.touches[0].clientY < clientHeight*.05) {
+			} else if (event.originalEvent.touches[0].clientY < clientHeight*.1) {
 				clearInterval(this.time)
 				this.time = setInterval(()=> {
 					this.thisScrollTop =  $(document).scrollTop();
@@ -199,6 +199,8 @@ class Drag {
 	dragEnd (item, event) {
 		if (this.isStart === 1) {
 			event.preventDefault();
+
+			clearInterval(this.time)
 
 			var this_item = $(item);
 			var this_parent = $(this.parent);
