@@ -150,6 +150,7 @@ class Drag {
 		  	}).attr("data-move", "")
 			}
 
+			// 如果拖拽超出了屏幕 nextUntil prevUntil 获取中间滑过的所有 item 进行变化
 			if (this.time !== null) {
 				if (this.direction === "down") {
 					this_item.nextUntil($(ele), this.item).css({
@@ -203,6 +204,7 @@ class Drag {
 			this.time = null
 			this_item.removeClass("moving").siblings().removeClass("disable");
 
+			// 补充拖拽超出屏幕发生的情况，设置中间 item 的 data-move 
 			if (this.direction === 'down') {
 				let downlast = $(this.item+'[data-move=-1]').last();
 				if (downlast.length > 0) {
@@ -263,9 +265,9 @@ class Drag {
 
 	/*
 		获取元素原本的下标到滑到的下标的总距离
-		direction -> 方向
-		moveStartIndex -> 移动前的起始下标
-		moveEndIndex -> 移动结束后的下标
+		direction 			-> 方向
+		moveStartIndex 	-> 移动前的起始下标
+		moveEndIndex 		-> 移动结束后的下标
 	*/
 	getItemHeight (direction, moveStartIndex, moveEndIndex) {
 		let totalHeight = 0;
@@ -283,7 +285,7 @@ class Drag {
 
 	/*
 		计算某个字段在数组中出现过多少次
-		arr -> 数组
+		arr 	-> 数组
 		value -> 要计算的字段
 	*/
 	getTotalInArr (arr, value) {
